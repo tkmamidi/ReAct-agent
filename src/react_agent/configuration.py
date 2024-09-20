@@ -8,7 +8,9 @@ from typing import Annotated, Optional
 from langchain_core.runnables import RunnableConfig, ensure_config
 
 from react_agent import prompts
+from langfuse.callback import CallbackHandler
 
+langfuse_handler = CallbackHandler()
 
 @dataclass(kw_only=True)
 class Configuration:
