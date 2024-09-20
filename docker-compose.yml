@@ -1,0 +1,9 @@
+services:
+  cgds-react-agent:
+    build: .
+    ports:
+      - "8501:8501"  # Update with the actual port your application uses
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app

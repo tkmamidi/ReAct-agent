@@ -14,6 +14,7 @@ from langchain_core.tools import InjectedToolArg
 from typing_extensions import Annotated
 
 from react_agent.configuration import Configuration
+from neo4j import AsyncGraphDatabase
 
 
 async def search(
@@ -31,4 +32,25 @@ async def search(
     return cast(list[dict[str, Any]], result)
 
 
-TOOLS: List[Callable[..., Any]] = [search]
+async def query_neo4j(
+    query: str,
+) -> Optional[list[dict[str, Any]]]:
+    """Query the Neo4j database.
+    This function executes a Cypher query against a Neo4j database and returns the results. It's particularly useful
+    for answering questions about proteins, drugs, pathways, phenotypes, diseases and their relationships. Use proteins
+    as nodes to query about genes.
+    """
+    uri = "bolt://tarun.servebeer.com/neo4j-api"  # Update with your Neo4j instance URI
+    user = "neo4j"  # Update with your Neo4j username
+    password = "password"  # Update with your Neo4j password
+    driver = AsyncGraphDatabase.driver(uri, auth=(user, password))
+    records, _, _ = await driver.execute_query(
+        query,
+        routing_="r",  # short for neo4j.RoutingControl.READ
+        database_="neo4j",
+    )
+
+    return cast(list[dict[str, Any]], records)
+
+
+TOOLS: List[Callable[..., Any]] = [search, query_neo4j]
